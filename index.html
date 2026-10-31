@@ -1,1 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMOC Control &bull; Gestão Inteligente de Climatização</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Biblioteca QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Biblioteca jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            #printable-area, #printable-area * { visibility: visible; }
+            #printable-area { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none !important; border: none !important; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
 
+    <!-- Cabeçalho Principal -->
+    <header class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white shadow-lg py-5 px-6">
+        <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2.5 rounded-xl shadow-inner border border-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-wide bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">PMOC Control</h1>
+                    <p class="text-xs text-blue-200 font-medium">Plataforma de Gestão em Refrigeração e Climatização</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs bg-blue-700/60 border border-blue-500/40 px-3 py-1.5 rounded-full font-medium tracking-wide shadow-sm">
+                    Sistemas & Laudos Técnicos
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-grow container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Coluna Esquerda: Formulário de Cadastro -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 lg:col-span-1 h-fit">
+            <div class="flex items-center gap-2 mb-5 pb-3 border-b border-slate-100">
+                <div class="w-2 h-6 bg-blue-600 rounded-full"></div>
+                <h2 class="text-lg font-bold text-slate-800">Cadastrar Equipamento</h2>
+            </div>
+            
+            <form id="pmocForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Nome da Empresa / Cliente</label>
+                    <input type="text" id="empresa" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm" placeholder="Ex: Supermercado Central">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Identificação / Tag do Equipamento</label>
+                    <input type="text" id="equipamento" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm" placeholder="Ex: Split Inverter 24.000 BTUs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Localização / Setor</label>
+                    <input type="text" id="local" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm" placeholder="Ex: Sala de Reuniões - 2º Andar">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Periodicidade da Manutenção</label>
+                    <select id="periodicidade" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm">
+                        <option value="Mensal">Mensal</option>
+                        <option value="Trimestral">Trimestral</option>
+                        <option value="Semestral">Semestral</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">URL do Logotipo (Opcional)</label>
+                    <input type="url" id="logoUrl" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm" placeholder="https://exemplo.com/logo.png">
+                </div>
+                <button type="submit" class="w-full mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md shadow-blue-500/20 active:scale-[0.99] transition duration-200 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Cadastrar e Gerar QR Code
+                </button>
+            </form>
+        </section>
+
+        <!-- Coluna Direita: Painel QR Code, Relatórios e Lista -->
+        <section class="lg:col-span-2 space-y-6">
+            
+            <!-- Área de Visualização do QR Code -->
+            <div id="printable-area" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500"></div>
+                
+                <h3 class="text-base font-bold text-slate-800 mb-1 mt-2">Etiqueta Inteligente QR Code</h3>
+                <p class="text-xs text-slate-500 mb-5">Fixação recomendada no gabinete do equipamento para histórico e vistorias.</p>
+                
+                <div id="qrcode-container" class="p-4 bg-white border-2 border-dashed border-slate-200 rounded-2xl shadow-sm relative flex flex-col items-center justify-center min-h-[170px] min-w-[170px] transition-all">
+                    <div class="text-slate-400 text-xs flex flex-col items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                        <span>Selecione um equipamento na tabela abaixo</span>
+                    </div>
+                </div>
+                
+                <div id="qr-info" class="mt-4 text-xs text-slate-600 hidden space-y-0.5 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
+                    <p id="info-empresa" class="font-bold text-slate-800 text-sm"></p>
+                    <p id="info-equipamento" class="text-slate-600"></p>
+                    <p id="info-local" class="text-slate-500"></p>
+                </div>
+
+                <div class="no-print mt-6 flex gap-3 flex-wrap justify-center">
+                    <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Imprimir Etiqueta
+                    </button>
+                    <button id="btnRelatorio" onclick="gerarRelatorioPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm shadow-emerald-600/20 transition flex items-center gap-1.5 hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Gerar Relatório PMOC (PDF)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabela de Equipamentos Cadastrados -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-6 bg-blue-600 rounded-full"></div>
+                        <h3 class="text-lg font-bold text-slate-800">Equipamentos Cadastrados</h3>
+                    </div>
+                    <span id="contadorEquipamentos" class="text-xs bg-slate-100 text-slate-600 font-semibold px-2.5 py-1 rounded-full">0 ativos</span>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50/70 text-slate-500 text-xs font-bold uppercase tracking-wider">
+                                <th class="p-3.5 rounded-l-xl">Cliente</th>
+                                <th class="p-3.5">Equipamento</th>
+                                <th class="p-3.5">Local</th>
+                                <th class="p-3.5">Periodicidade</th>
+                                <th class="p-3.5 text-center rounded-r-xl">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaEquipamentos" class="text-sm divide-y divide-slate-100">
+                            <!-- Inserido via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
+        PMOC Control &bull; Todos os direitos reservados
+    </footer>
+
+    <!-- Lógica JavaScript -->
+    <script>
+        let equipamentos = JSON.parse(localStorage.getItem('pmoc_control_equipamentos')) || [];
+        let equipamentoAtual = null;
+
+        document.getElementById('pmocForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const novoEquipamento = {
+                id: Date.now(),
+                empresa: document.getElementById('empresa').value,
+                equipamento: document.getElementById('equipamento').value,
+                local: document.getElementById('local').value,
+                periodicidade: document.getElementById('periodicidade').value,
+                logoUrl: document.getElementById('logoUrl').value
+            };
+
+            equipamentos.push(novoEquipamento);
+            salvarERenderizar();
+            selecionarEquipamento(novoEquipamento.id);
+            this.reset();
+        });
+
+        function salvarERenderizar() {
+            localStorage.setItem('pmoc_control_equipamentos', JSON.stringify(equipamentos));
+            const tbody = document.getElementById('tabelaEquipamentos');
+            document.getElementById('contadorEquipamentos').innerText = `${equipamentos.length} ${equipamentos.length === 1 ? 'ativo' : 'ativos'}`;
+            tbody.innerHTML = '';
+
+            if (equipamentos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 text-sm">Nenhum equipamento cadastrado até o momento.</td></tr>`;
+                return;
+            }
+
+            equipamentos.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50 transition";
+                tr.innerHTML = `
+                    <td class="p-3.5 font-medium text-slate-800">${item.empresa}</td>
+                    <td class="p-3.5 text-slate-600">${item.equipamento}</td>
+                    <td class="p-3.5 text-slate-600">${item.local}</td>
+                    <td class="p-3.5"><span class="bg-blue-50 text-blue-700 font-semibold px-2.5 py-1 rounded-full text-xs border border-blue-100">${item.periodicidade}</span></td>
+                    <td class="p-3.5 text-center space-x-3">
+                        <button onclick="selecionarEquipamento(${item.id})" class="text-blue-600 hover:text-blue-800 font-semibold transition">QR Code</button>
+                        <button onclick="excluir(${item.id})" class="text-rose-500 hover:text-rose-700 font-medium transition">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function selecionarEquipamento(id) {
+            const item = equipamentos.find(eq => eq.id === id);
+            if (!item) return;
+            equipamentoAtual = item;
+
+            const container = document.getElementById('qrcode-container');
+            container.innerHTML = '';
+            container.className = "p-4 bg-white border border-slate-200 rounded-2xl shadow-inner relative flex flex-col items-center justify-center min-h-[170px] min-w-[170px]";
+
+            const dadosQR = `PMOC Control - Cliente: ${item.empresa} | Equip: ${item.equipamento} | Local: ${item.local} | Manutenção: ${item.periodicidade}`;
+
+            const qrCodeDiv = document.createElement('div');
+            container.appendChild(qrCodeDiv);
+
+            new QRCode(qrCodeDiv, {
+                text: dadosQR,
+                width: 140,
+                height: 140,
+                colorDark : "#0f172a",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            if(item.logoUrl) {
+                const logoImg = document.createElement('img');
+                logoImg.src = item.logoUrl;
+                logoImg.className = "absolute w-9 h-9 object-contain bg-white p-1 rounded-lg border border-slate-200 shadow-md";
+                container.appendChild(logoImg);
+            }
+
+            document.getElementById('qr-info').classList.remove('hidden');
+            document.getElementById('info-empresa').innerText = item.empresa;
+            document.getElementById('info-equipamento').innerText = `Equipamento: ${item.equipamento}`;
+            document.getElementById('info-local').innerText = `Setor: ${item.local} (${item.periodicidade})`;
+            document.getElementById('btnRelatorio').classList.remove('hidden');
+        }
+
+        function excluir(id) {
+            equipamentos = equipamentos.filter(eq => eq.id !== id);
+            salvarERenderizar();
+            if (equipamentoAtual && equipamentoAtual.id === id) {
+                equipamentoAtual = null;
+                document.getElementById('qrcode-container').innerHTML = `
+                    <div class="text-slate-400 text-xs flex flex-col items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                        <span>Selecione um equipamento na tabela abaixo</span>
+                    </div>
+                `;
+                document.getElementById('qr-info').classList.add('hidden');
+                document.getElementById('btnRelatorio').classList.add('hidden');
+            }
+        }
+
+        function gerarRelatorioPDF() {
+            if (!equipamentoAtual) return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Cabeçalho PDF
+            doc.setFillColor(15, 23, 42);
+            doc.rect(14, 15, 182, 22, "F");
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.text("PMOC CONTROL - LAUDO DE MANUTENÇÃO", 20, 28);
+
+            // Dados do Cliente
+            doc.setTextColor(30, 41, 59);
+            doc.setFontSize(11);
+            doc.text("DADOS DO ATIVO E DO CLIENTE", 14, 47);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            let y = 55;
+            doc.text(`Cliente / Empresa: ${equipamentoAtual.empresa}`, 14, y);
+            doc.text(`Equipamento: ${equipamentoAtual.equipamento}`, 14, y + 6);
+            doc.text(`Local / Setor: ${equipamentoAtual.local}`, 14, y + 12);
+            doc.text(`Periodicidade: ${equipamentoAtual.periodicidade}`, 14, y + 18);
+            doc.text(`Data da Emissão: ${new Date().toLocaleDateString('pt-BR')}`, 14, y + 24);
+
+            // Checklist
+            doc.setFont("helvetica", "bold");
+            doc.text("CHECKLIST DE ATIVIDADES DE MANUTENÇÃO", 14, y + 36);
+
+            let checkY = y + 42;
+            doc.setFillColor(241, 245, 249);
+            doc.rect(14, checkY, 182, 8, "F");
+            doc.text("Item Verificado", 18, checkY + 6);
+            doc.text("Status", 140, checkY + 6);
+            doc.text("Conforme", 170, checkY + 6);
+
+            const itensChecklist = [
+                "Limpeza de filtros de ar (retirada de sujidades)",
+                "Verificação e higienização das bandejas de condensado",
+                "Verificação do estado das serpentinas (evaporadora e condensadora)",
+                "Medição das pressões de operação (Fluido Refrigerante)",
+                "Reaperto de conexões elétricas e bornes",
+                "Verificação do isolamento térmico das tubulações",
+                "Testes de ruído, vibração e eficiência térmica"
+            ];
+
+            doc.setFont("helvetica", "normal");
+            itensChecklist.forEach((item, index) => {
+                let rowY = checkY + 12 + (index * 8);
+                doc.text(item, 18, rowY);
+                doc.text("[ X ] OK", 140, rowY);
+                doc.text("[  ] N/A", 170, rowY);
+            });
+
+            // Observações e Assinaturas
+            let obsY = checkY + 14 + (itensChecklist.length * 8) + 10;
+            doc.setFont("helvetica", "bold");
+            doc.text("OBSERVAÇÕES TÉCNICAS:", 14, obsY);
+            doc.setFont("helvetica", "normal");
+            doc.rect(14, obsY + 4, 182, 20);
+            doc.text("Equipamento operando dentro dos parâmetros nominais e exigências da norma vigente.", 18, obsY + 12);
+
+            let assY = obsY + 42;
+            doc.line(14, assY, 90, assY);
+            doc.line(110, assY, 196, assY);
+            doc.setFontSize(9);
+            doc.text("Assinatura do Técnico Responsável", 30, assY + 5);
+            doc.text("Assinatura / Visto do Cliente", 130, assY + 5);
+
+            doc.save(`PMOC_Control_${equipamentoAtual.empresa.replace(/\s+/g, '_')}.pdf`);
+        }
+
+        salvarERenderizar();
+    </script>
+</body>
+</html>
