@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMOC Control Pro &bull; Gestão, Laudos e Recibos</title>
+    <title>PMOC Control Pro &bull; RC Gestão HVAC</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Biblioteca QRCode.js -->
@@ -32,12 +32,12 @@
                 </div>
                 <div>
                     <h1 class="text-2xl font-black tracking-wide bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">PMOC Control Pro</h1>
-                    <p class="text-xs text-blue-200 font-medium">Gestão de Climatização, PMOC, Laudos e Recibos</p>
+                    <p class="text-xs text-blue-200 font-medium">RC Gestão HVAC &bull; Laudos, PMOC e Recibos</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
                 <span class="text-xs bg-blue-700/60 border border-blue-500/40 px-3 py-1.5 rounded-full font-medium tracking-wide shadow-sm">
-                    Versão Web GitHub Ready
+                    Versão GitHub Ready
                 </span>
             </div>
         </div>
@@ -137,4 +137,422 @@
                             Imprimir Etiqueta
                         </button>
                         <button id="btnRelatorio" onclick="gerarRelatorioPMOC()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-1.5 hidden">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Exportar Relatório PMOC (PDF)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de Equipamentos -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-800 text-sm">Equipamentos Cadastrados</h3>
+                        <span id="contadorEquipamentos" class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg font-medium">0 itens</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-100 text-xs text-slate-400 uppercase font-semibold">
+                                    <th class="py-3 px-3">Empresa / Cliente</th>
+                                    <th class="py-3 px-3">Equipamento</th>
+                                    <th class="py-3 px-3">Local</th>
+                                    <th class="py-3 px-3">Periodicidade</th>
+                                    <th class="py-3 px-3 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaEquipamentos">
+                                <tr>
+                                    <td colspan="5" class="py-6 text-center text-slate-400 text-xs">Nenhum equipamento cadastrado ainda.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- SEÇÃO 2: LAUDOS TÉCNICOS -->
+        <div id="secao-laudos" class="hidden max-w-3xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
+            <div class="flex items-center gap-2 mb-6 pb-3 border-b border-slate-100">
+                <div class="w-2 h-6 bg-blue-600 rounded-full"></div>
+                <h2 class="text-lg font-bold text-slate-800">Emissão de Laudo Técnico de Climatização</h2>
+            </div>
+            
+            <form id="laudoForm" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Cliente / Contratante</label>
+                        <input type="text" id="laudoCliente" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm" placeholder="Nome do cliente ou empresa">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Técnico Responsável</label>
+                        <input type="text" id="laudoTecnico" required value="RC Gestão HVAC" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Equipamento Avaliado (Marca/Modelo/Capacidade)</label>
+                    <input type="text" id="laudoEquip" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm" placeholder="Ex: Split Cassete 36.000 BTUs Inverter">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Diagnóstico / Condição Encontrada</label>
+                    <textarea id="laudoDiagnostico" rows="4" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm" placeholder="Descreva detalhadamente o problema ou estado técnico constatado..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Serviço Recomendado / Executado</label>
+                    <textarea id="laudoServico" rows="3" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm" placeholder="Descreva as soluções aplicadas ou recomendadas..."></textarea>
+                </div>
+                <button type="button" onclick="gerarLaudoPDF()" class="w-full mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md shadow-blue-500/20 active:scale-[0.99] transition duration-200 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Gerar e Baixar Laudo Técnico (PDF)
+                </button>
+            </form>
+        </div>
+
+        <!-- SEÇÃO 3: RECIBOS DE SERVIÇOS -->
+        <div id="secao-recibos" class="hidden max-w-3xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
+            <div class="flex items-center gap-2 mb-6 pb-3 border-b border-slate-100">
+                <div class="w-2 h-6 bg-blue-600 rounded-full"></div>
+                <h2 class="text-lg font-bold text-slate-800">Emissão de Recibo de Serviços</h2>
+            </div>
+            
+            <form id="reciboForm" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Nome do Pagador / Cliente</label>
+                        <input type="text" id="reciboCliente" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm" placeholder="Nome completo ou empresa">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Valor (R$)</label>
+                        <input type="text" id="reciboValor" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm" placeholder="Ex: 350,00">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Descrição dos Serviços Prestados</label>
+                    <textarea id="reciboDescricao" rows="4" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm" placeholder="Ex: Manutenção preventiva e higienização química de 2 aparelhos split..."></textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Data do Pagamento</label>
+                        <input type="date" id="reciboData" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Emitente / Prestador</label>
+                        <input type="text" id="reciboEmitente" required value="RC Gestão HVAC" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm">
+                    </div>
+                </div>
+                <button type="button" onclick="gerarReciboPDF()" class="w-full mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md shadow-blue-500/20 active:scale-[0.99] transition duration-200 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    Gerar e Baixar Recibo (PDF)
+                </button>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
+        <p>&copy; 2026 PMOC Control Pro &bull; RC Gestão HVAC. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Lógica JavaScript -->
+    <script>
+        let equipamentos = JSON.parse(localStorage.getItem('pmoc_equipamentos')) || [];
+        let equipamentoSelecionado = null;
+        let qrCodeInstance = null;
+
+        // Gerenciamento de Abas
+        function mudarAba(aba) {
+            document.getElementById('secao-pmoc').classList.add('hidden');
+            document.getElementById('secao-laudos').classList.add('hidden');
+            document.getElementById('secao-recibos').classList.add('hidden');
+
+            document.getElementById('tab-pmoc').className = "py-3.5 px-4 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 transition whitespace-nowrap";
+            document.getElementById('tab-laudos').className = "py-3.5 px-4 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 transition whitespace-nowrap";
+            document.getElementById('tab-recibos').className = "py-3.5 px-4 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 transition whitespace-nowrap";
+
+            if (aba === 'pmoc') {
+                document.getElementById('secao-pmoc').classList.remove('hidden');
+                document.getElementById('tab-pmoc').className = "py-3.5 px-4 font-bold text-sm border-b-2 border-blue-600 text-blue-600 flex items-center gap-2 transition whitespace-nowrap";
+            } else if (aba === 'laudos') {
+                document.getElementById('secao-laudos').classList.remove('hidden');
+                document.getElementById('tab-laudos').className = "py-3.5 px-4 font-bold text-sm border-b-2 border-blue-600 text-blue-600 flex items-center gap-2 transition whitespace-nowrap";
+            } else if (aba === 'recibos') {
+                document.getElementById('secao-recibos').classList.remove('hidden');
+                document.getElementById('tab-recibos').className = "py-3.5 px-4 font-bold text-sm border-b-2 border-blue-600 text-blue-600 flex items-center gap-2 transition whitespace-nowrap";
+            }
+        }
+
+        // Salvar ou Atualizar Equipamento
+        document.getElementById('pmocForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const empresa = document.getElementById('empresa').value;
+            const whatsapp = document.getElementById('whatsapp').value;
+            const equipamento = document.getElementById('equipamento').value;
+            const local = document.getElementById('local').value;
+            const periodicidade = document.getElementById('periodicidade').value;
+
+            if (id) {
+                const index = equipamentos.findIndex(eq => eq.id == id);
+                if (index !== -1) {
+                    equipamentos[index] = { id: Number(id), empresa, whatsapp, equipamento, local, periodicidade };
+                }
+            } else {
+                const novoEquip = {
+                    id: Date.now(),
+                    empresa,
+                    whatsapp,
+                    equipamento,
+                    local,
+                    periodicidade
+                };
+                equipamentos.push(novoEquip);
+            }
+
+            salvarEAtualizar();
+            resetarFormulario();
+        });
+
+        function salvarEAtualizar() {
+            localStorage.setItem('pmoc_equipamentos', JSON.stringify(equipamentos));
+            renderizarTabela();
+        }
+
+        function renderizarTabela() {
+            const tbody = document.getElementById('listaEquipamentos');
+            const contador = document.getElementById('contadorEquipamentos');
+            contador.innerText = `${equipamentos.length} item${equipamentos.length !== 1 ? 's' : ''}`;
+
+            if (equipamentos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">Nenhum equipamento cadastrado ainda.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            equipamentos.forEach(eq => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-50 hover:bg-slate-50/80 transition cursor-pointer";
+                tr.onclick = () => selecionarEquipamento(eq.id);
+                tr.innerHTML = `
+                    <td class="py-3 px-3 font-medium text-slate-800">${eq.empresa}</td>
+                    <td class="py-3 px-3 text-slate-600">${eq.equipamento}</td>
+                    <td class="py-3 px-3 text-slate-500">${eq.local}</td>
+                    <td class="py-3 px-3"><span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs font-semibold">${eq.periodicidade}</span></td>
+                    <td class="py-3 px-3 text-right" onclick="event.stopPropagation()">
+                        <button onclick="editarEquipamento(${eq.id})" class="text-blue-600 hover:text-blue-800 p-1 text-xs font-semibold mr-2">Editar</button>
+                        <button onclick="excluirEquipamento(${eq.id})" class="text-rose-500 hover:text-rose-700 p-1 text-xs font-semibold">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function selecionarEquipamento(id) {
+            equipamentoSelecionado = equipamentos.find(eq => eq.id == id);
+            if (!equipamentoSelecionado) return;
+
+            const container = document.getElementById('qrcode-container');
+            container.innerHTML = '';
+            
+            const qrText = `Empresa: ${equipamentoSelecionado.empresa}\nEquipamento: ${equipamentoSelecionado.equipamento}\nLocal: ${equipamentoSelecionado.local}\nPeriodicidade: ${equipamentoSelecionado.periodicidade}`;
+            
+            new QRCode(container, {
+                text: qrText,
+                width: 140,
+                height: 140
+            });
+
+            document.getElementById('qr-info').classList.remove('hidden');
+            document.getElementById('info-empresa').innerText = equipamentoSelecionado.empresa;
+            document.getElementById('info-equipamento').innerText = `${equipamentoSelecionado.equipamento} (${equipamentoSelecionado.local})`;
+            document.getElementById('info-local').innerText = `Manutenção: ${equipamentoSelecionado.periodicidade}`;
+            document.getElementById('btnRelatorio').classList.remove('hidden');
+        }
+
+        function editarEquipamento(id) {
+            const eq = equipamentos.find(item => item.id == id);
+            if (!eq) return;
+
+            document.getElementById('editId').value = eq.id;
+            document.getElementById('empresa').value = eq.empresa;
+            document.getElementById('whatsapp').value = eq.whatsapp || '';
+            document.getElementById('equipamento').value = eq.equipamento;
+            document.getElementById('local').value = eq.local;
+            document.getElementById('periodicidade').value = eq.periodicidade;
+
+            document.getElementById('formTitulo').innerText = "Editar Equipamento";
+            document.getElementById('btnSalvar').innerText = "Atualizar Equipamento";
+            document.getElementById('btnCancelarEdicao').classList.remove('hidden');
+        }
+
+        function resetarFormulario() {
+            document.getElementById('pmocForm').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('formTitulo').innerText = "Cadastrar Equipamento";
+            document.getElementById('btnSalvar').innerText = "Salvar Equipamento";
+            document.getElementById('btnCancelarEdicao').classList.add('hidden');
+        }
+
+        function excluirEquipamento(id) {
+            if (confirm("Deseja realmente excluir este equipamento?")) {
+                equipamentos = equipamentos.filter(eq => eq.id != id);
+                salvarEAtualizar();
+                if (equipamentoSelecionado && equipamentoSelecionado.id == id) {
+                    equipamentoSelecionado = null;
+                    document.getElementById('qrcode-container').innerHTML = `
+                        <div class="text-slate-400 text-xs flex flex-col items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                            <span>Selecione um equipamento abaixo</span>
+                        </div>`;
+                    document.getElementById('qr-info').classList.add('hidden');
+                    document.getElementById('btnRelatorio').classList.add('hidden');
+                }
+            }
+        }
+
+        // Funções de Geração de PDF com jsPDF
+        function gerarRelatorioPMOC() {
+            if (!equipamentoSelecionado) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFillColor(30, 58, 138); // Azul escuro
+            doc.rect(0, 0, 210, 25, "F");
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("RC Gestão HVAC - Relatório PMOC", 14, 16);
+
+            doc.setTextColor(51, 51, 51);
+            doc.setFontSize(12);
+            doc.text("Dados do Cliente e Equipamento", 14, 38);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.text(`Empresa / Cliente: ${equipamentoSelecionado.empresa}`, 14, 48);
+            doc.text(`WhatsApp: ${equipamentoSelecionado.whatsapp || 'Não informado'}`, 14, 55);
+            doc.text(`Identificação (Tag): ${equipamentoSelecionado.equipamento}`, 14, 62);
+            doc.text(`Localização: ${equipamentoSelecionado.local}`, 14, 69);
+            doc.text(`Periodicidade: ${equipamentoSelecionado.periodicidade}`, 14, 76);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Plano de Manutenção, Operação e Controle (PMOC)", 14, 92);
+            doc.setFont("helvetica", "normal");
+            doc.text("Laudo de conformidade técnica emitido conforme diretrizes normativas vigentes.", 14, 99);
+
+            doc.setDrawColor(200, 200, 200);
+            doc.line(14, 110, 196, 110);
+
+            doc.text("Atividades Realizadas / Vistoria:", 14, 122);
+            doc.text("- Verificação de pressões e temperaturas de operação.", 18, 130);
+            doc.text("- Limpeza de filtros de ar e serpentinas.", 18, 137);
+            doc.text("- Inspeção do sistema elétrico e dreno.", 18, 144);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("RC Gestão HVAC", 14, 180);
+            doc.setFont("helvetica", "normal");
+            doc.text("Assinatura do Técnico Responsável", 14, 186);
+
+            doc.save(`Relatorio_PMOC_${equipamentoSelecionado.empresa.replace(/\s+/g, '_')}.pdf`);
+        }
+
+        function gerarLaudoPDF() {
+            const cliente = document.getElementById('laudoCliente').value;
+            const tecnico = document.getElementById('laudoTecnico').value;
+            const equip = document.getElementById('laudoEquip').value;
+            const diagnostico = document.getElementById('laudoDiagnostico').value;
+            const servico = document.getElementById('laudoServico').value;
+
+            if (!cliente || !equip || !diagnostico || !servico) {
+                alert("Por favor, preencha todos os campos do laudo técnico.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFillColor(30, 58, 138);
+            doc.rect(0, 0, 210, 25, "F");
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("RC Gestão HVAC - Laudo Técnico", 14, 16);
+
+            doc.setTextColor(51, 51, 51);
+            doc.setFontSize(11);
+            doc.text(`Cliente: ${cliente}`, 14, 38);
+            doc.text(`Técnico: ${tecnico}`, 14, 46);
+            doc.text(`Equipamento: ${equip}`, 14, 54);
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 62);
+
+            doc.setDrawColor(220, 220, 220);
+            doc.line(14, 70, 196, 70);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Diagnóstico Técnico:", 14, 82);
+            doc.setFont("helvetica", "normal");
+            doc.text(doc.splitTextToSize(diagnostico, 180), 14, 90);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Serviço Executado / Recomendado:", 14, 125);
+            doc.setFont("helvetica", "normal");
+            doc.text(doc.splitTextToSize(servico, 180), 14, 133);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("RC Gestão HVAC", 14, 185);
+            doc.setFont("helvetica", "normal");
+            doc.text("Responsável Técnico", 14, 191);
+
+            doc.save(`Laudo_Tecnico_${cliente.replace(/\s+/g, '_')}.pdf`);
+        }
+
+        function gerarReciboPDF() {
+            const cliente = document.getElementById('reciboCliente').value;
+            const valor = document.getElementById('reciboValor').value;
+            const descricao = document.getElementById('reciboDescricao').value;
+            const data = document.getElementById('reciboData').value;
+            const emitente = document.getElementById('reciboEmitente').value;
+
+            if (!cliente || !valor || !descricao || !data) {
+                alert("Por favor, preencha todos os campos do recibo.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFillColor(30, 58, 138);
+            doc.rect(0, 0, 210, 25, "F");
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("RC Gestão HVAC - Recibo de Serviços", 14, 16);
+
+            doc.setTextColor(51, 51, 51);
+            doc.setFontSize(14);
+            doc.text(`Valor: R$ ${valor}`, 14, 40);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+            doc.text(`Recebemos de: ${cliente}`, 14, 54);
+            doc.text(`A quantia referente a:`, 14, 64);
+            
+            doc.setFont("helvetica", "bold");
+            doc.text(doc.splitTextToSize(descricao, 180), 14, 72);
+
+            doc.setFont("helvetica", "normal");
+            doc.text(`Data: ${new Date(data).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}`, 14, 110);
+            doc.text(`Emitente: ${emitente}`, 14, 118);
+
+            doc.setDrawColor(150, 150, 150);
+            doc.line(14, 160, 100, 160);
+            doc.text("Assinatura do Prestador / RC Gestão HVAC", 14, 167);
+
+            doc.save(`Recibo_${cliente.replace(/\s+/g, '_')}.pdf`);
+        }
+
+        // Inicializar tabela na carga da página
+        renderizarTabela();
+    </script>
+</body>
+</html>
